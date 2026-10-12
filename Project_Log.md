@@ -28,7 +28,7 @@
 ### UI Redesign Demo (Standalone)
 - Dibuat **high-fidelity standalone demo** (`wa-finance-demo.html`) yang mereplikasi desain baru 100% identik dengan referensi.
 - Demo mencakup: Dashboard penuh (hero banner, metric cards, Chart.js area & donut chart, recent transactions, quote card) dan halaman Transaksi (summary banner, 7 category cards, activity table lengkap).
-- Demo dapat dibuka di browser lokal: `file:///Users/christambayong/Downloads/wa-finance-demo.html`
+- Demo dapat dibuka di browser lokal: `file://~/workspace/Downloads/wa-finance-demo.html`
 
 ### Visual Assets untuk Hero Header
 Dua gambar asli telah disalin ke dalam proyek frontend (`Vault/frontend`) dan siap dipakai oleh Codex untuk integrasi ke React:

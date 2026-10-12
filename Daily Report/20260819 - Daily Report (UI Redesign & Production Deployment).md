@@ -5,7 +5,7 @@
 **Status:** ✅ 100% Done, Tested & Live di Production  
 **Live Production URL:** [https://api-finance.i729.my.id/](https://api-finance.i729.my.id/)  
 **GitHub Repository:** [https://github.com/hittoukiri-design/wa-finance](https://github.com/hittoukiri-design/wa-finance) (Release `v.2`)  
-**Host Server:** Mac mini Production Server (`192.168.1.27`), User `chris`, Docker container `wa-finance-api`  
+**Host Server:** Mac mini Production Server (`SERVER_ADDRESS`), User `OPERATOR`, Docker container `wa-finance-api`
 **Disusun Oleh:** Antigravity (Untuk panduan lengkap transfer knowledge ke Agent berikutnya / Codex)  
 
 ---
@@ -32,7 +32,7 @@ Semua pekerjaan hari ini diselesaikan dengan prinsip:
 | **Iconography** | **Lucide React + Custom SVG** | Ikon outline clean, financial symbols, flame icon 🔥, document icon 📄, status dots, dan logo WhatsApp. |
 | **Database & Auth** | **Firebase Firestore & Firebase Auth** | Penyimpanan real-time transaksi, pengaturan sumber dana dompet, limit budget kategori, dan autentikasi multi-sesi. |
 | **Backend Service** | **Node.js Express + Baileys** | Gateway API server untuk WhatsApp bot, Google Apps Script bridge, dan background sync. |
-| **Host & Container** | **Mac mini (macOS) + Docker Compose** | Server mandiri (`192.168.1.27`) menjalankan container `wa-finance-api` di balik Cloudflare/reverse proxy `api-finance.i729.my.id`. |
+| **Host & Container** | **Mac mini (macOS) + Docker Compose** | Server mandiri (`SERVER_ADDRESS`) menjalankan container `wa-finance-api` di balik Cloudflare/reverse proxy `api-finance.i729.my.id`. |
 | **Automation & Deploy** | **Python 3 + OpenSSH + GNU Tar Stream** | Script generator bebas escape-error, transfer build file via SSH pipe (solusi ketiadaan `rsync` di server), dan Docker reload. |
 | **Version Control** | **Git + GitHub CLI (`gh`)** | Pelacakan versi, tag rilis `v.2`, dan publikasi GitHub Release otomatis. |
 
@@ -178,23 +178,23 @@ Setiap kali ada perubahan kode frontend, jalankan langkah-langkah berikut secara
 
 ```bash
 # ── LANGKAH 1: Build Frontend Menggunakan Vite ──
-cd "/Users/christambayong/Downloads/Project/WA Finance/Vault/frontend"
+cd "~/workspace/Downloads/Project/WA Finance/Vault/frontend"
 npm run build
 
 # ── LANGKAH 2: Sinkronisasi Folder Public Backend Lokal ──
-rm -rf "/Users/christambayong/Downloads/Project/WA Finance/Vault/backend/public"
-cp -r "/Users/christambayong/Downloads/Project/WA Finance/Vault/frontend/dist" "/Users/christambayong/Downloads/Project/WA Finance/Vault/backend/public"
+rm -rf "~/workspace/Downloads/Project/WA Finance/Vault/backend/public"
+cp -r "~/workspace/Downloads/Project/WA Finance/Vault/frontend/dist" "~/workspace/Downloads/Project/WA Finance/Vault/backend/public"
 
 # ── LANGKAH 3: Stream Deploy ke Mac mini Server via SSH Tar Pipe & Rebuild Docker ──
-cd "/Users/christambayong/Downloads/Project/WA Finance/Vault/frontend"
-tar --exclude='.DS_Store' -czf - dist/ | ssh -i /Users/christambayong/.gemini/antigravity/scratch/id_ed25519 -o StrictHostKeyChecking=no chris@192.168.1.27 "cd /data/repositories/wa-finance/workspace/backend && rm -rf public && mkdir -p public && tar -xzf - --strip-components=1 -C public/ && docker compose -f /data/appdata/wa-finance/docker-compose.yml up -d --build wa-finance-api 2>&1 | tail -6"
+cd "~/workspace/Downloads/Project/WA Finance/Vault/frontend"
+tar --exclude='.DS_Store' -czf - dist/ | ssh -i ~/workspace/.gemini/antigravity/scratch/id_ed25519 -o StrictHostKeyChecking=no OPERATOR@SERVER_ADDRESS "cd /data/repositories/wa-finance/workspace/backend && rm -rf public && mkdir -p public && tar -xzf - --strip-components=1 -C public/ && docker compose -f /data/appdata/wa-finance/docker-compose.yml up -d --build wa-finance-api 2>&1 | tail -6"
 
 # ── LANGKAH 4: Verifikasi Status Live Production ──
 curl -s -o /dev/null -w "HTTP %{http_code} - Health: " https://api-finance.i729.my.id/api/health
 curl -s https://api-finance.i729.my.id/ | grep "index-"
 
 # ── LANGKAH 5: Commit & Push ke GitHub Repository ──
-cd "/Users/christambayong/Downloads/Project/WA Finance"
+cd "~/workspace/Downloads/Project/WA Finance"
 git add Vault/frontend/src/ Vault/backend/ Project_Log.md "Daily Report/"
 git commit -m "feat/fix: <deskripsi perubahan>"
 git push origin main

@@ -32,7 +32,8 @@ async function restoreSession(userId, sessionPath) {
     if (!files.length) return false;
     await Promise.all(files.map(async (file) => {
         const relative = file.name.slice(prefix(userId).length);
-        const target = path.join(sessionPath, relative);
+        const target = path.resolve(sessionPath, relative);
+        if (!target.startsWith(path.resolve(sessionPath) + path.sep)) throw new Error('Invalid session object path');
         fs.mkdirSync(path.dirname(target), { recursive: true });
         await file.download({ destination: target });
     }));
