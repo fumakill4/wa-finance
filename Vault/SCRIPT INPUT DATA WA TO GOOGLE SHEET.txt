@@ -8,7 +8,7 @@
 /* ================================
    KONFIGURASI - Pakai Script Properties
    Cara set: Extensions > Apps Script > Project Settings > Script Properties
-   Keys: GROQ_API_KEY, SPREADSHEET_ID
+   Keys: GROQ_API_KEY, SPREADSHEET_ID, GATEWAY_SECRET, GATEWAY_USER_ID
 ================================ */
 const CONFIG = {
   SCRIPT_VERSION: "WA_FINANCE_SCRIPT_V2_6_IDEMPOTENT_MESSAGE_ID",
@@ -44,6 +44,12 @@ function doPost(e) {
 
     const data = safeParseJson_(e.postData.contents);
     if (!data) return respond_("❌ Format JSON tidak valid.");
+    const properties = PropertiesService.getScriptProperties();
+    const gatewaySecret = properties.getProperty("GATEWAY_SECRET") || "";
+    const gatewayUserId = properties.getProperty("GATEWAY_USER_ID") || "";
+    if (!constantTimeTokenEqual_(gatewaySecret, data.gatewaySecret) || !gatewayUserId || data.session !== gatewayUserId) {
+      return respond_("❌ Authentication required.");
+    }
 
     pesan   = (data.body  || "").trim();
     session = data.session || "-";
@@ -64,7 +70,8 @@ function doPost(e) {
     lock.waitLock(30000);
 
     // Spreadsheet ID dari webapp diprioritaskan; Script Properties menjadi fallback.
-    const spreadsheetId = (data.spreadsheet_id || getConfig_("SPREADSHEET_ID")).trim();
+    const spreadsheetId = getConfig_("SPREADSHEET_ID").trim();
+    if (data.spreadsheet_id && data.spreadsheet_id !== spreadsheetId) return respond_("❌ Spreadsheet access denied.");
     const ss            = SpreadsheetApp.openById(spreadsheetId);
     ensureDefaultRekening_(ss);
 
@@ -179,23 +186,16 @@ function doPost(e) {
 }
 
 function doGet() {
-  let propertySpreadsheetId = "";
-  try {
-    propertySpreadsheetId = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID") || "";
-  } catch (_) {}
-  return respond_(
-    `${CONFIG.SCRIPT_VERSION}\n` +
-    `SPREADSHEET_ID=${propertySpreadsheetId || "-"}\n` +
-    `TIME=${new Date().toISOString()}`
-  );
+  return respond_("WA Finance endpoint is available.");
 }
 
+function constantTimeTokenEqual_(expected, provided) {
+  if (typeof expected !== "string" || expected.length < 32 || typeof provided !== "string") return false;
+  let difference = expected.length ^ provided.length;
+  for (let i = 0; i < expected.length; i++) difference |= expected.charCodeAt(i) ^ (provided.charCodeAt(i) || 0);
+  return difference === 0;
+}
 
-/* ================================================================
-   COMMAND HANDLERS
-================================================================ */
-
-/** Handler: saldo [rekening?] */
 function handleSaldo_(ss, pesan) {
   const parts = pesan.trim().split(/\s+/);
   if (parts.length > 1) {

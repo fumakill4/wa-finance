@@ -10,7 +10,7 @@
 ## Kronologi Insiden
 
 1. User lapor WA bot tidak reply dan transaksi tidak tercatat
-2. SSH ke `192.168.1.27` → `No route to host` → server freeze/kernel panic
+2. SSH ke `SERVER_ADDRESS` → `No route to host` → server freeze/kernel panic
 3. User hard reset Mac Mini
 4. Setelah reboot, SSH OK tapi `wa-finance-api` tidak ada di `docker ps`
 5. Coba start container → **Error: no space left on device**

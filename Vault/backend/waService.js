@@ -1,4 +1,5 @@
-// This App was build by Chris Tambayong - Fumakill4
+const { fetchAppsScript, validUserId } = require('./http-security');
+// This App was build by i729 - Fumakill4
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion, jidDecode, jidNormalizedUser } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 const path = require('path');
@@ -1177,7 +1178,7 @@ async function forwardMessageToAppsScript(endpoint, payload, options = {}) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
-        const response = await fetch(endpoint, {
+        const response = await fetchAppsScript(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -1836,6 +1837,7 @@ async function initSession(userId) {
     // Ensure user exists in DB
     db.prepare(`INSERT OR IGNORE INTO users (id) VALUES (?)`).run(userId);
 
+    if (!validUserId(userId)) throw new Error('Invalid session identifier');
     const sessionPath = path.join(sessionsDir, userId);
     try {
         if (!sessionsNeedingFreshQr.has(userId)) await restoreSession(userId, sessionPath);
@@ -1988,6 +1990,7 @@ function deleteSession(userId) {
         sock.logout();
     }
     activeSessions.delete(userId);
+    if (!validUserId(userId)) throw new Error('Invalid session identifier');
     const sessionPath = path.join(sessionsDir, userId);
     if (fs.existsSync(sessionPath)) {
         fs.rmSync(sessionPath, { recursive: true, force: true });

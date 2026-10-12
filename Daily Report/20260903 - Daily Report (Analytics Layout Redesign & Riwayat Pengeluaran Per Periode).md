@@ -2,7 +2,7 @@
 
 **Tanggal:** 03 September 2026  
 **Project:** WA Finance Gateway  
-**Status:** Selesai, di-commit ke Git (latest: `1adaa330`), di-deploy ke Server Production Mac Mini (`192.168.1.27`), dan terverifikasi live.
+**Status:** Selesai, di-commit ke Git (latest: `1adaa330`), di-deploy ke Server Production Mac Mini (`SERVER_ADDRESS`), dan terverifikasi live.
 
 ---
 

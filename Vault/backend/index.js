@@ -1,7 +1,7 @@
-// This App was build by Chris Tambayong - Fumakill4
+// This App was build by i729 - Fumakill4
 /**
  * WA Finance Gateway Platform
- * @copyright 2026 WA Finance App created by Chris Tambayong
+ * @copyright 2026 WA Finance App created by i729
  */
 const express = require('express');
 const cors = require('cors');
@@ -29,36 +29,17 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 
 const PORT = process.env.PORT || 5000;
 const INTERNAL_ADMIN_TOKEN = process.env.INTERNAL_ADMIN_TOKEN || '';
 
-const authenticate = async (req, res, next) => {
-    const authorization = req.headers.authorization || '';
-    const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
-
-    if (!token && process.env.NODE_ENV !== 'production') {
-        req.userId = req.headers['x-user-id'] || 'default-user';
-        return next();
-    }
-
-    if (!token) return res.status(401).json({ error: 'Firebase authentication token diperlukan.' });
-
-    try {
-        const decoded = await getAdminAuth().verifyIdToken(token);
-        req.userId = decoded.uid;
-        req.user = decoded;
-        next();
-    } catch (error) {
-        console.error('Firebase token verification failed:', error.message);
-        res.status(401).json({ error: 'Sesi Firebase tidak valid atau sudah kedaluwarsa.' });
-    }
-};
+const { createAuthenticate, validUserId, tokenMatches, isAllowedEndpoint, fetchAppsScript } = require('./http-security');
+const authenticate = createAuthenticate((token, revoked) => getAdminAuth().verifyIdToken(token, revoked));
 
 const authenticateInternal = (req, res, next) => {
     const token = req.headers['x-internal-token'] || '';
-    if (!INTERNAL_ADMIN_TOKEN || token !== INTERNAL_ADMIN_TOKEN) {
+    if (!tokenMatches(INTERNAL_ADMIN_TOKEN, token)) {
         return res.status(401).json({ error: 'Internal token tidak valid.' });
     }
     next();
@@ -117,24 +98,15 @@ function sanitizeBudgetThresholds(value) {
     return [...new Set(next)].length ? [...new Set(next)] : [80, 90, 95, 100];
 }
 
-function isAllowedEndpoint(value) {
-    if (!value) return true;
-    try {
-        const parsed = new URL(value);
-        return parsed.protocol === 'https:' || (parsed.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(parsed.hostname));
-    } catch (_) {
-        return false;
-    }
-}
 
-async function callAppsScript(endpoint) {
+async function callAppsScript(endpoint, userId) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
     try {
-        const response = await fetch(endpoint, {
+        const response = await fetchAppsScript(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session: 'settings-test', from: 'dashboard', body: 'ping', command: 'ping' }),
+            body: JSON.stringify({ session: userId, from: 'dashboard', body: 'ping', command: 'ping' }),
             signal: controller.signal,
         });
         const responseText = await response.text();
@@ -149,7 +121,7 @@ async function postAppsScript(endpoint, payload, timeoutMs = 45000) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
-        const response = await fetch(endpoint, {
+        const response = await fetchAppsScript(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -366,7 +338,7 @@ app.post('/api/apps-script/test', authenticate, async (req, res) => {
     }
 
     try {
-        const result = await callAppsScript(endpoint);
+        const result = await callAppsScript(endpoint, req.userId);
         const saved = await saveUserSettings(req.userId, {
             apps_script_url: endpoint,
             apps_script_status: 'connected',
@@ -489,7 +461,7 @@ app.delete('/api/whatsapp/disconnect', authenticate, (req, res) => {
 
 app.post('/api/internal/whatsapp/connect', authenticateInternal, async (req, res) => {
     const userId = String(req.body?.userId || '').trim();
-    if (!userId) return res.status(400).json({ error: 'userId wajib diisi.' });
+    if (!validUserId(userId)) return res.status(400).json({ error: 'userId wajib diisi.' });
     try {
         await initSession(userId);
         res.json({ message: 'Session initialization started', userId });
@@ -501,13 +473,13 @@ app.post('/api/internal/whatsapp/connect', authenticateInternal, async (req, res
 
 app.get('/api/internal/whatsapp/status', authenticateInternal, (req, res) => {
     const userId = String(req.query?.userId || '').trim();
-    if (!userId) return res.status(400).json({ error: 'userId wajib diisi.' });
+    if (!validUserId(userId)) return res.status(400).json({ error: 'userId wajib diisi.' });
     res.json(getSessionStatus(userId));
 });
 
 app.delete('/api/internal/whatsapp/session', authenticateInternal, (req, res) => {
     const userId = String(req.body?.userId || '').trim();
-    if (!userId) return res.status(400).json({ error: 'userId wajib diisi.' });
+    if (!validUserId(userId)) return res.status(400).json({ error: 'userId wajib diisi.' });
     res.json(deleteSession(userId));
 });
 

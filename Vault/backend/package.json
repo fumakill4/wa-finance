@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "Chris Tambayong",
+  "author": "i729",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {

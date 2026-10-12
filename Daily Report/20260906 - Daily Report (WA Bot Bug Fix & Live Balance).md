@@ -11,7 +11,7 @@
 
 ### 1. Server Mac Mini Mati Suri (i729)
 
-**Gejala:** WA bot tidak merespon pesan "bayar tagihan wifi". Ping ke `192.168.1.27` → `Host is down`.
+**Gejala:** WA bot tidak merespon pesan "bayar tagihan wifi". Ping ke `SERVER_ADDRESS` → `Host is down`.
 
 **Root Cause:** Server di-force shutdown paksa, menyebabkan:
 - Mac Mini tidak muncul di DHCP list router
@@ -24,7 +24,7 @@
 3. Tancap kembali, nyalakan sambil tekan `Windows + Alt + P + R` (reset NVRAM/PRAM)
 4. Setelah chime kedua berbunyi, sistem berhasil masuk GRUB Debian
 5. Login manual via TTY1 dengan keyboard Logitech (`chris@i729:~$`)
-6. SSH berhasil kembali di `192.168.1.27`
+6. SSH berhasil kembali di `SERVER_ADDRESS`
 
 **Pelajaran:** Selalu gunakan `sudo shutdown now` atau `sudo reboot`, JANGAN force shutdown paksa.
 

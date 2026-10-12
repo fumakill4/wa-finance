@@ -1,4 +1,4 @@
-// This App was build by Chris Tambayong - Fumakill4
+// This App was build by i729 - Fumakill4
 import React from 'react';
 import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';

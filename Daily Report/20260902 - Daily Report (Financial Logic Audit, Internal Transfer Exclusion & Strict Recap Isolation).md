@@ -2,7 +2,7 @@
 
 **Tanggal:** 02 September 2026  
 **Project:** WA Finance Gateway  
-**Status:** Selesai, di-commit ke Git (`233bd43c`), di-deploy ke Server Production Mac Mini (`192.168.1.27`), dan terverifikasi 100% normal.
+**Status:** Selesai, di-commit ke Git (`233bd43c`), di-deploy ke Server Production Mac Mini (`SERVER_ADDRESS`), dan terverifikasi 100% normal.
 
 ---
 
@@ -63,7 +63,7 @@ Pada audit sistem keuangan WebApp & Bot WhatsApp ditemukan beberapa masalah utam
 - 🟢 **Pemasukan Aktif**: Murni **Rp 3.140.000** (Gaji Istri Rp 2,73jt + Uang IMEI Rp 410k). Pindah saldo Rp 1.865.000 tidak lagi menggelembungkan Pemasukan.
 - 🔴 **Pengeluaran Aktif**: Murni **Rp 3.119.349** (Kosan 1,1jt, Cicilan Motor 765k, Tagihan Dana 372k, Imei 280k, Belanja & Makan). Pindah saldo Rp 1.865.000 tidak lagi menggelembungkan Pengeluaran.
 - 💳 **Saldo Dompet**: BCA & Superbank dihitung murni dari transaksi aktif periode berjalan tanpa ada kebocoran transaksi lama.
-- 🚀 **Production Deployment**: Build terbaru (`index-DyUCDnUu.js`) telah di-commit, di-push ke GitHub (`233bd43c`), dan container Docker `wa-finance-api` di server Mac Mini (`192.168.1.27`) telah di-restart secara LIVE.
+- 🚀 **Production Deployment**: Build terbaru (`index-DyUCDnUu.js`) telah di-commit, di-push ke GitHub (`233bd43c`), dan container Docker `wa-finance-api` di server Mac Mini (`SERVER_ADDRESS`) telah di-restart secara LIVE.
 
 ---
 

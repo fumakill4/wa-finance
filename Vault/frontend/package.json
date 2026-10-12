@@ -2,7 +2,7 @@
   "name": "frontend",
   "private": true,
   "version": "0.0.0",
-  "author": "Chris Tambayong",
+  "author": "i729",
   "type": "module",
   "scripts": {
     "dev": "vite",
